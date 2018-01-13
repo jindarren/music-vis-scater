@@ -3,8 +3,8 @@ html, body {
     padding: 5px 10px 0px 10px;
     font: 14px Helvetica, Arial;
     font-weight: 100;
-    color: lightgrey;
-    background-color: #292929;
+    color: #0b0b0b;
+    background-color: #ffffff;
 }
 
 a {
@@ -587,7 +587,7 @@ ul.none {
     padding-left: 10px;
     flex-direction: row;
     margin-bottom: 3px;
-    background: rgba(41, 41, 41, 0.82);
+    background: rgba(239, 239, 239, 0.82);
 }
 
 p.detail-title.number > span:nth-child(2), #tag-value{

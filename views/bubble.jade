@@ -1,0 +1,71 @@
+html
+    head
+        meta(charset='utf-8')
+        link(rel="stylesheet" type = "text/css", href = "../components-font-awesome/css/font-awesome.css")
+        link(rel='stylesheet', href='../stylesheets/scatter.css', charset='utf-8')
+        style(type='text/css').
+            text {
+                font: 10px sans-serif;
+            }
+            circle {
+                stroke: #565352;
+                stroke-width: 1;
+            }
+
+            .d3-tip {
+                line-height: 1;
+                font-weight: bold;
+                padding: 12px;
+                background: rgba(0, 0, 0, 0.8);
+                color: #fff;
+                border-radius: 2px;
+            }
+
+            /* Creates a small triangle extender for the tooltip */
+            .d3-tip:after {
+                box-sizing: border-box;
+                display: inline;
+                font-size: 10px;
+                width: 100%;
+                line-height: 1;
+                color: rgba(0, 0, 0, 0.8);
+                content: "\25BC";
+                position: absolute;
+                text-align: center;
+            }
+
+            /* Style northward tooltips differently */
+            .d3-tip.n:after {
+                margin: -1px 0 0 0;
+                top: 100%;
+                left: 0;
+            }
+            circle {
+                fill-opacity: .5;
+            }
+
+            #bubble{
+                border:1px solid lightgrey;
+                margin-top: 65px;
+            }
+    body
+        div.row
+            div.col-md-8
+                #bubble
+            div.col-md-4
+                h4 Recommendations
+                label The top 20 songs
+                div.recom
+                    div#recom-seeds
+        script(src='http://d3js.org/d3.v3.min.js', charset='utf-8')
+        script(src='http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js')
+        script(type = "text/javascript", src = "../jquery/dist/jquery.js", charset = 'utf-8')
+        script(type = "text/javascript", src = "../jquery-ui/jquery-ui.js", charset = 'utf-8')
+        script(type = "text/javascript", src = "../seiyria-bootstrap-slider/dist/bootstrap-slider.js", charset = 'utf-8')
+        script(type = "text/javascript", src = "../bootstrap/dist/js/bootstrap.js", charset = 'utf-8')
+        script(type = "text/javascript", src = "../jquery.cookie/jquery.cookie.js", charset = 'utf-8')
+        link(rel="stylesheet" type = "text/css", href = "../jquery-ui/themes/base/jquery-ui.css")
+        link(rel="stylesheet" type = "text/css", href = "../seiyria-bootstrap-slider/dist/css/bootstrap-slider.min.css")
+        link(rel="stylesheet" type = "text/css", href = "../bootstrap/dist/css/bootstrap.css")
+        link(rel="stylesheet" type = "text/css", href = "../stylesheets/style.css")
+        script(src='../js/bubble.js', charset='utf-8')

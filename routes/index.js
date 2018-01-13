@@ -5,10 +5,11 @@ var passport = require('passport');
 var SpotifyStrategy = require('../node_modules/passport-spotify/lib/passport-spotify/index').Strategy;
 var path = require('path');
 var request = require('request');
+var csvdata = require('csvdata');
 var User = require('../model/user');
 
-var appKey = 'xxxxxxxxxxxxxxxxxxxxxxxxx';
-var appSecret = 'xxxxxxxxxxxxxxxxxxxxxxxxx';
+appKey = 'a1d9f15f6ba54ef5aea0c5c4e19c0d2c',
+appSecret = 'b368bdb3003747ec861e62d3bf381ba0',
 
 // Passport session setup.
 //   To support persistent login sessions, Passport needs to be able to
@@ -159,6 +160,13 @@ router.get('/login-s8',function (req,res) {
     res.render('login-s8')
 })
 
+router.get('/scatter',function (req,res) {
+    res.render('scatter')
+})
+
+router.get('/bubble',function (req,res) {
+    res.render('bubble')
+})
 
 /*
  route for web API
@@ -188,9 +196,7 @@ router.get('/getGenre',function (req,res) {
 
 router.get('/getRecom',function (req,res) {
     var result = {}
-    recom(req.query.token).getRecommendation(req.query.limit,req.query.artistSeed,req.query.trackSeed,req.query.genreSeed,req.query.min_danceability, req.query.max_danceability,
-        req.query.min_energy, req.query.max_energy, req.query.min_instrumentalness, req.query.max_instrumentalness, req.query.min_liveness, req.query.max_liveness,
-        req.query.min_speechiness, req.query.max_speechiness, req.query.min_valence, req.query.max_valence).then(function (data) {
+    recom(req.query.token).getRecommendation(req.query.limit,req.query.artistSeed,req.query.trackSeed,req.query.genreSeed).then(function (data) {
         result.items = data;
         res.json(result)})
 })
@@ -241,21 +247,23 @@ router.get('/getAccount',function (req,res) {
         res.json(data)})
 })
 
-
 router.get('/initiate', function (req, res) {
     //pass token to the webAPI used by recommender
 
     var reqData = {};
+    var oneArtistSeed, oneTrackSeed, visData=[];
 
     var getTopArtists =
         recom(req.query.token).getTopArtists(50).then(function (data) {
             reqData.artist = data;
+            oneArtistSeed = data[0].id;
         });
 
 
     var getTracks =
         recom(req.query.token).getTopTracks(50).then(function (data) {
-            reqData.track = data
+            reqData.track = data;
+            oneTrackSeed = data[0].id;
         });
 
 
@@ -265,9 +273,50 @@ router.get('/initiate', function (req, res) {
         });
 
     Promise.all([getTopArtists, getTracks, getGenres]).then(function () {
-        res.json({
-            seed: reqData
+
+        recom(req.query.token).getRecommendation(20,oneArtistSeed, oneTrackSeed).then(function (data) {
+            var artistIds = [], trackIds=[];
+            for(var index in data){
+                var oneRecommendation = {};
+                oneRecommendation.id = data[index].artists[0].id;
+                oneRecommendation.name = data[index].name;
+                oneRecommendation.popularity =  data[index].popularity;
+                oneRecommendation.track = data[index].id;
+                artistIds.push(data[index].artists[0].id)
+                trackIds.push(data[index].id)
+                visData.push(oneRecommendation)
+            }
+
+
+            recom(req.query.token).getAudioFeatures(trackIds).then(function (data) {
+                for(var index in data.audio_features){
+                    visData[index].danceability = data.audio_features[index].danceability;
+                    visData[index].energy = data.audio_features[index].energy;
+                    visData[index].speechiness = data.audio_features[index].speechiness;
+                    visData[index].acousticness = data.audio_features[index].acousticness;
+                    visData[index].instrumentalness = data.audio_features[index].instrumentalness;
+                    visData[index].liveness = data.audio_features[index].liveness;
+                    visData[index].valence = data.audio_features[index].valence;
+                }
+
+                recom(req.query.token).getGenresForArtists(artistIds).then(function (data2) {
+
+                    for(var index in data2.artists){
+                        visData[index].genre = data2.artists[index].genres[0]
+                    }
+                    // csvdata.write('./vis.csv', visData, {header: 'id,name,popularity,track,danceability,energy,speechiness,acousticness,instrumentalness,liveness,valence,genre'})
+                    res.json({
+                        seed: reqData,
+                        vis: visData
+                    })
+                })
+            })
+
+
+
         })
+
+
     })
 
 });
@@ -305,8 +354,8 @@ router.get('/callback',
             maxAge: 3600000
         });
 
-        res.redirect('/play');
-
+        //res.redirect('/play');
+        res.redirect('/scatter');
     });
 
 //

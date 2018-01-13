@@ -3,8 +3,8 @@
  */
 var recommender = function (token) {
     var SpotifyWebApi = require('spotify-web-api-node'),
-        appKey = 'xxxxxxxxxxxxxxxxxxxxxxxxx',
-        appSecret = 'xxxxxxxxxxxxxxxxxxxxxxxxx',
+        appKey = 'a1d9f15f6ba54ef5aea0c5c4e19c0d2c',
+        appSecret = 'b368bdb3003747ec861e62d3bf381ba0',
         redirectUrl = 'http://spotify-avi.us-3.evennode.com/callback';
         //redirectUrl = 'http://localhost:3000/callback';
 
@@ -17,6 +17,25 @@ var recommender = function (token) {
     spotifyApi.setAccessToken(token);
 
     return {
+
+        getAudioFeatures:function(ids) {
+            return spotifyApi.getAudioFeaturesForTracks([ids])
+                .then(function(data) {
+                    return data.body
+                }, function(err) {
+                    return err
+                });
+        },
+
+        getGenresForArtists:function(ids) {
+            return spotifyApi.getArtists([ids])
+                .then(function(data) {
+                    return data.body
+                }, function(err) {
+                    return err
+                });
+        },
+
 
         getFollowedArtists: function (limitNum){
             return spotifyApi.getFollowedArtists({
@@ -90,26 +109,11 @@ var recommender = function (token) {
         },
 
 
-        getRecommendation: function (limitNum, artistSeeds, trackSeeds, genreSeeds, min_danceability, max_danceability,
-                                             min_energy, max_energy, min_instrumentalness, max_instrumentalness, min_liveness, max_liveness,
-                                             min_speechiness, max_speechiness, min_valence,max_valence) {
+        getRecommendation: function (limitNum, artistSeeds, trackSeeds, genreSeeds) {
             return spotifyApi.getRecommendations({
                 limit: limitNum,
                 seed_artists: artistSeeds,
-                seed_tracks: trackSeeds,
-                seed_genres: genreSeeds,
-                min_danceability: min_danceability,
-                max_danceability: max_danceability,
-                min_energy: min_energy,
-                max_energy: max_energy,
-                min_instrumentalness: min_instrumentalness,
-                max_instrumentalness: max_instrumentalness,
-                min_liveness: min_liveness,
-                max_liveness: max_liveness,
-                min_speechiness: min_speechiness,
-                max_speechiness: max_speechiness,
-                min_valence: min_valence,
-                max_valence: max_valence
+                seed_tracks: trackSeeds
             }).then(function (data) {
                 return data.body.tracks
             }, function (err) {

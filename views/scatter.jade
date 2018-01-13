@@ -1,0 +1,49 @@
+html
+    head
+        meta(charset='utf-8')
+        title Visualization
+        link(rel="stylesheet" type = "text/css", href = "../bootstrap/dist/css/bootstrap.css")
+        link(rel="stylesheet" type = "text/css", href = "../components-font-awesome/css/font-awesome.css")
+        link(rel='stylesheet', href='../stylesheets/scatter.css', charset='utf-8')
+    body
+        div.row
+            div.col-md-8
+                #scatter
+                p X Axis&nbsp&nbsp
+                    select#x-axis
+                        option(value='valence', selected=) valence
+                        option(value='danceability') danceability
+                        option(value='energy') energy
+                        option(value='speechiness') speechiness
+                        option(value='acousticness') acousticness
+                        option(value='instrumentalness') instrumentalness
+                        option(value='liveness') liveness
+                p.des#des-x
+                p Y Axis&nbsp&nbsp
+                    select#y-axis
+                        option(value='valence') valence
+                        option(value='danceability') danceability
+                        option(value='energy') energy
+                        option(value='speechiness') speechiness
+                        option(value='acousticness') acousticness
+                        option(value='instrumentalness') instrumentalness
+                        option(value='liveness', selected=) liveness
+                p.des#des-y
+            div.col-md-4
+                h4 Recommendations
+                label The top 20 songs
+                div.recom
+                    div#recom-seeds
+        script(src='http://d3js.org/d3.v3.min.js', charset='utf-8')
+        script(src='http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js')
+        script(type = "text/javascript", src = "../jquery/dist/jquery.js", charset = 'utf-8')
+        script(type = "text/javascript", src = "../jquery-ui/jquery-ui.js", charset = 'utf-8')
+        script(type = "text/javascript", src = "../seiyria-bootstrap-slider/dist/bootstrap-slider.js", charset = 'utf-8')
+        script(type = "text/javascript", src = "../bootstrap/dist/js/bootstrap.js", charset = 'utf-8')
+        script(type = "text/javascript", src = "../jquery.cookie/jquery.cookie.js", charset = 'utf-8')
+        link(rel="stylesheet" type = "text/css", href = "../jquery-ui/themes/base/jquery-ui.css")
+        link(rel="stylesheet" type = "text/css", href = "../seiyria-bootstrap-slider/dist/css/bootstrap-slider.min.css")
+        link(rel="stylesheet" type = "text/css", href = "../bootstrap/dist/css/bootstrap.css")
+        link(rel="stylesheet" type = "text/css", href = "../stylesheets/style.css")
+        script(src='../js/scatter.js', charset='utf-8')
+
