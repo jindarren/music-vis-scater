@@ -460,13 +460,8 @@ setTimeout(function () {
     var totalRating = $(".fa-thumbs-up").length + $(".fa-thumbs-down").length
     if(totalRating==20){
         $("a.btn.btn-info.questionnaire").attr("href","https://goo.gl/forms/pfo5yBSLxojFZWOB2")
-    }else{
-        $("p#start-feedback").show();
-        setTimeout(function () {
-            $("p#start-feedback").hide();
-        },8000)
     }
-}, 1000*10*60);
+}, 1000*10);
 
 //Sent Logs
 $('.questionnaire').click(function () {
