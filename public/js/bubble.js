@@ -423,7 +423,7 @@ setTimeout(function () {
     if(totalRating==20){
         $("a.btn.btn-info.questionnaire").attr("href","https://goo.gl/forms/tNqrRPi4zw0hA5kO2")
     }
-}, 1000*10);
+}, 1000*10*60);
 
 //Sent Logs
 $('.questionnaire').click(function () {
