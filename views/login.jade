@@ -1,0 +1,113 @@
+doctype html
+html
+    head
+        link(rel="stylesheet" type = "text/css", href = "../bootstrap/dist/css/bootstrap.css")
+        link(href='../stylesheets/base.css', rel='stylesheet')
+        link(href='../stylesheets/welcome.css', rel='stylesheet')
+        script(type = "text/javascript", src = "../jquery/dist/jquery.js", charset = 'utf-8')
+        script(type = "text/javascript", src = "../bootstrap/dist/js/bootstrap.js", charset = 'utf-8')
+        link(href='https://fonts.googleapis.com/css?family=Open+Sans|Roboto', rel='stylesheet')
+        script(type='text/javascript', src='../js/welcome.js')
+        script.
+            var isPlayed = false;
+            // 2. This code loads the IFrame Player API code asynchronously.
+            var tag = document.createElement('script');
+            tag.src = "https://www.youtube.com/iframe_api";
+            var firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+            // 3. This function creates an <iframe> (and YouTube player)
+            //    after the API code downloads.
+            var player;
+            function onYouTubeIframeAPIReady() {
+                player = new YT.Player('player', {
+                    height: '270',
+                    width: '480',
+                    videoId: 'FMyf9iGi4uc',
+                    events: {
+                        'onReady': onPlayerReady,
+                        'onStateChange': onPlayerStateChange
+                    }
+                });
+            }
+            // 4. The API will call this function when the video player is ready.
+            function onPlayerReady(event) {
+                //event.target.playVideo();
+            }
+            // 5. The API calls this function when the player's state changes.
+            //    The function indicates that when playing a video (state=1),
+            //    the player should play for six seconds and then stop.
+            var done = false;
+            function onPlayerStateChange(event) {
+                if (event.data == YT.PlayerState.ENDED) {
+                    isPlayed=true
+                    if($("#selectTopic option:selected").attr("value") != "bitte")
+                        $("a.btn.btn-geckoboard").attr("href",'/auth/spotify')
+                }
+            }
+        meta(charset='utf-8')
+        title Welcome
+    body
+        .container-fluid
+            header
+                h1
+                    | Welcome to a user study about music recommendations
+            .row
+                .col-sm-6
+                    p(style='color:#12ADFF; font-weight:1000')
+                        | Please note you need to be a frequent or heavy user of Spotify, otherwise the system cannot generate recommendations for you. Thank you.
+
+                    h4  Introduction
+                    p
+                        | We use the Spotify API to design this music recommender system that provides you with suggestions of songs based on your interests. The system allows you to interact with two visualizations to explore good songs.
+                    p
+                        | In this study, we aim to measure your perceived diversity of recommended songs.
+
+                    h4
+                        | Your Task
+                    p
+                        | First, please watch a video tutorial for the system. Before starting user study, you need to fill a pre-study questionnaire. The questionnaire contains a memory test. The study link will be shown in the end of the questionnaire.
+                    p
+                        | After login, you will see a recommended playlist containing 20 songs based on your listening history. You can explore the songs from a visualization on left side, then you have to listen and rate all recommended songs and then answer a post-study questionnaire. In this study, you will evaluate 2 different visualizations for recommendations. Participating in this study will take about 35 - 40 minutes.
+
+                    p(style="color:white")
+                        | Please ensure you have spent 10 minutes on the study for each visualization. A questionnaire link only will be activated at the right top corner when all songs have been listened and rated.
+
+                    //h4
+                    //    | Working scenario
+                    //p
+                    //    | Please select a scenario where you may want to create a playlist. There are four scenarios.
+                    //input#choose(type='hidden', value='Please choose a scenario!')
+                    //div
+                    //    select#selectTopic.form-control(name='topicName', style='width: 300px;')
+                    //        option(selected="" value='bitte')
+                    //            | Please choose ...
+                    //        option(value='Rock night') My life needs passion
+                    //        option(value='Dance party') Dance till the world ends
+                    //        option(value='Joyful day') A joyful day after passing all my exams
+                    //        option(value='HipHop-club') Cannot live without hip-hop
+                    //    .descriptions
+                    //        #chooseDiv.topicDivs
+                    //            p
+                    //                | Please select a scenario where you may want to create a playlist!
+                    //        #chilloutDiv.topicDivs(hidden='')
+                    //            p
+                    //                | I am so happy that I have passed all my exams for this semester. I need to listen to some nice music to relax.
+                    //        #rockDiv.topicDivs(hidden='')
+                    //            p
+                    //                | Sometimes, I feel my life is too quiet. I need to make some noise to find my passion.
+                    //        #partyDiv.topicDivs(hidden='')
+                    //            p
+                    //                | Tonight, my friends will come to my place to celebrate my birthday. A good party needs rhythmic songs. With these songs the dance floor surely will not be empty!
+                    //        #hiphopDiv.topicDivs(hidden='')
+                    //            p
+                    //                | I feel like something that will make me think and show my different attitudes. I want to create a playlist with cool lyrics and strong beats.
+                .col-sm-6
+                    h4
+                        | Tutorial
+                    p
+                        | Please watch the following tutorial before the task. A link of task will be activated after the video.
+                    div#player
+                    div
+                        a.btn.btn-lg.btn-block.btn-geckoboard(style='margin-top: 10px; color: white')
+                            | Start
+                        p#start-feedback(style="display:none; color:yellow") Please ensure that you have finished the video tutorial.

@@ -54,18 +54,28 @@ router.post("/addRecord", function(req, res){
     var user = new User({
         timestamp: req.body.timestamp,
         id : req.body.id,
-        setting : req.body.setting,
+        path: req.body.path,
         duration: req.body.duration,
         rating: req.body.rating,
+        vis : req.body.vis,
         likedTime: req.body.likedTime,
-        lowSortingTime: req.body.lowSortingTime,
-        lowRemovingTime: req.body.lowRemovingTime,
-        lowRatingTimes: req.body.lowRatingTime,
-        middleDraggingTime: req.body.middleDraggingTime,
-        middleLoadMoreTime: req.body.middleLoadMoreTime,
-        highSliderTime: req.body.highSliderTime,
-        highSortingTime: req.body.highSortingTime,
-        detailTime:req.body.detailTime
+        recoms:req.body.recoms,
+        diversity : req.body.diversity,
+        hoverTime: req.body.hoverTime,
+        clickTime: req.body.clickTime,
+        axisTime: req.body.axisTime
+        // setting : req.body.setting,
+        // duration: req.body.duration,
+        // rating: req.body.rating,
+        // likedTime: req.body.likedTime,
+        // lowSortingTime: req.body.lowSortingTime,
+        // lowRemovingTime: req.body.lowRemovingTime,
+        // lowRatingTimes: req.body.lowRatingTime,
+        // middleDraggingTime: req.body.middleDraggingTime,
+        // middleLoadMoreTime: req.body.middleLoadMoreTime,
+        // highSliderTime: req.body.highSliderTime,
+        // highSortingTime: req.body.highSortingTime,
+        // detailTime:req.body.detailTime
     });
     console.log(req.body)
     user.save(function (err) {
@@ -92,7 +102,7 @@ router.get('/play',function (req,res) {
 })
 
 router.get('/logout',function (req,res) {
-    res.render('logout')
+    res.render('login')
 })
 
 
@@ -128,6 +138,10 @@ router.get('/s8',function (req,res) {
     res.render('s8',{ data: req.user})
 })
 
+router.get('/login',function (req,res) {
+    res.render('login')
+})
+
 router.get('/login-s1',function (req,res) {
     res.render('login-s1')
 })
@@ -161,11 +175,11 @@ router.get('/login-s8',function (req,res) {
 })
 
 router.get('/scatter',function (req,res) {
-    res.render('scatter')
+    res.render('scatter',{ data: req.user})
 })
 
 router.get('/bubble',function (req,res) {
-    res.render('bubble')
+    res.render('bubble',{ data: req.user})
 })
 
 /*
@@ -254,25 +268,70 @@ router.get('/initiate', function (req, res) {
     var oneArtistSeed, oneTrackSeed, visData=[];
 
     var getTopArtists =
-        recom(req.query.token).getTopArtists(50).then(function (data) {
+        recom(req.query.token).getTopArtists(1).then(function (data) {
             reqData.artist = data;
             oneArtistSeed = data[0].id;
         });
 
 
     var getTracks =
-        recom(req.query.token).getTopTracks(50).then(function (data) {
+        recom(req.query.token).getTopTracks(1).then(function (data) {
             reqData.track = data;
             oneTrackSeed = data[0].id;
         });
 
 
-    var getGenres =
-        recom(req.query.token).getTopGenres().then(function (data) {
-            reqData.genre = data
-        });
+    // var getGenres =
+    //     recom(req.query.token).getTopGenres().then(function (data) {
+    //         reqData.genre = data
+    //     });
 
-    Promise.all([getTopArtists, getTracks, getGenres]).then(function () {
+    Promise.all([getTopArtists, getTracks]).then(function () {
+
+        // function array_remove_repeat(a) { // 去重
+        //     var r = [];
+        //     for(var i = 0; i < a.length; i ++) {
+        //         var flag = true;
+        //         var temp = a[i];
+        //         for(var j = 0; j < r.length; j ++) {
+        //             if(temp === r[j]) {
+        //                 flag = false;
+        //                 break;
+        //             }
+        //         }
+        //         if(flag) {
+        //             r.push(temp);
+        //         }
+        //     }
+        //     return r;
+        // }
+        //
+        // function array_intersection(a, b) { // 交集
+        //     var result = [];
+        //     for(var i = 0; i < b.length; i ++) {
+        //         var temp = b[i];
+        //         for(var j = 0; j < a.length; j ++) {
+        //             if(temp === a[j]) {
+        //                 result.push(temp);
+        //                 break;
+        //             }
+        //         }
+        //     }
+        //     return array_remove_repeat(result);
+        // }
+        //
+        // function array_union(a, b) { // 并集
+        //     return array_remove_repeat(a.concat(b));
+        // }
+
+        function jaccard (a,b){
+            var score
+            if(a!=b)
+                score = 0
+            else
+                score = 1
+            return score
+        }
 
         recom(req.query.token).getRecommendation(20,oneArtistSeed, oneTrackSeed).then(function (data) {
             var artistIds = [], trackIds=[];
@@ -301,24 +360,27 @@ router.get('/initiate', function (req, res) {
 
                 recom(req.query.token).getGenresForArtists(artistIds).then(function (data2) {
 
+                    var intraList=0;
                     for(var index in data2.artists){
                         visData[index].genre = data2.artists[index].genres[0]
+                        // visData[index].genres = data2.artists[index].genres
+                        for(var index2 in data2.artists){
+                            //intraList += jaccard(data2.artists[index].genres, data2.artists[index2].genres)
+                            intraList += jaccard(data2.artists[index].genres[0], data2.artists[index2].genres[0])
+                        }
                     }
+                    intraList = (intraList-20)/2
+
                     // csvdata.write('./vis.csv', visData, {header: 'id,name,popularity,track,danceability,energy,speechiness,acousticness,instrumentalness,liveness,valence,genre'})
                     res.json({
-                        seed: reqData,
-                        vis: visData
+                        // seed: reqData,
+                        vis: visData,
+                        intra: intraList
                     })
                 })
             })
-
-
-
         })
-
-
     })
-
 });
 
 
@@ -354,8 +416,8 @@ router.get('/callback',
             maxAge: 3600000
         });
 
-        //res.redirect('/play');
-        res.redirect('/scatter');
+        res.redirect('/play');
+        //res.redirect('/scatter');
     });
 
 //
@@ -416,8 +478,6 @@ router.get('/refresh-token', function(req, res) {
 
 router.get('/logout', function (req, res) {
     req.logout();
-    res.redirect("/logout")
 });
-
 
 module.exports = router;

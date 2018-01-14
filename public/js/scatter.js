@@ -1,6 +1,24 @@
 var spotifyToken = $.cookie('spotify-token')
 var refreshToken = $.cookie('refresh-token')
 
+var loggingSys = {}
+loggingSys.timestamp = new Date();
+loggingSys.id = '';
+loggingSys.path = window.location.pathname;
+loggingSys.duration = new Date();
+loggingSys.rating = {
+    id:[],
+    likes:[],
+    same:[]
+};
+loggingSys.vis = []
+loggingSys.likedTime = 0;
+loggingSys.recoms = [];
+loggingSys.diversity = 0;
+loggingSys.hoverTime = 0;
+loggingSys.clickTime = 0;
+loggingSys.axisTime = 0;
+
 var margin = { top: 50, right: 300, bottom: 50, left: 50 },
     outerWidth = 1050,
     outerHeight = 600,
@@ -35,19 +53,36 @@ var yCat = "liveness",
     rCat = "popularity",
     colorCat = "genre";
 
-
-
 $.ajax({
     url: "/initiate?token=" + spotifyToken,
     success: function (dat) {
-        console.log(dat.vis)
+        console.log(dat)
+        loggingSys.recoms = dat.vis;
+        loggingSys.diversity = dat.intra;
+
+        $("div#initial-loading").hide();
+        $(".main-content").show();
         var data = dat.vis
         var selectedNode;
         var recomList = [];
 
-        var regEvents = function(itemID) {
-            console.log(itemID)
 
+        function checkGenreVisit(id,preID){
+            var preGenre, curGenre
+            for (var index in loggingSys.recoms){
+                if(loggingSys.recoms[index].track==preID)
+                    preGenre = loggingSys.recoms[index].genre
+                else if(loggingSys.recoms[index].track==id)
+                    curGenre = loggingSys.recoms[index].genre
+            }
+            // console.log(preGenre, curGenre)
+            if(preGenre == curGenre)
+                return true
+            else if(preGenre != curGenre)
+                return false
+        }
+
+        var regEvents = function(itemID) {
 
             $("div#"+itemID+" > div.recom-icon >  div.recom-rating > i:eq(1)").click(function () {
                 //LOGGING
@@ -56,14 +91,21 @@ $.ajax({
                 var dislikedRecomId = $(this).parent().parent().parent().attr('id')
 
                 //LOGGING
-                // if(loggingSys.rating.id.indexOf(dislikedRecomId)<0){
-                //     loggingSys.rating.id.push(dislikedRecomId)
-                //     loggingSys.rating.likes.push(false)
-                // }else{
-                //     var index = loggingSys.rating.id.indexOf(dislikedRecomId)
-                //     loggingSys.rating.likes[index] = false
-                //     loggingSys.likedTime--
-                // }
+                if(loggingSys.rating.id.indexOf(dislikedRecomId)<0){
+                    loggingSys.rating.id.push(dislikedRecomId)
+                    loggingSys.rating.likes.push(false)
+                    if(loggingSys.rating.id.length>1)
+                        loggingSys.rating.same.push(checkGenreVisit(dislikedRecomId, loggingSys.rating.id[loggingSys.rating.id.length-2]))
+                    else
+                        loggingSys.rating.same.push(false)
+                }else{
+                    var index = loggingSys.rating.id.indexOf(dislikedRecomId)
+                    loggingSys.rating.likes[index] = false
+                    if(index>0)
+                        loggingSys.rating.same[index] = checkGenreVisit(dislikedRecomId, loggingSys.rating.id[index-1])
+                    else
+                        loggingSys.rating.same[index] = false
+                }
 
                 if($(this).hasClass("fa-thumbs-o-down")){
                     $(this).removeClass("fa-thumbs-o-down");
@@ -88,16 +130,21 @@ $.ajax({
 
                 //LOGGING
 
-                // if(loggingSys.rating.id.indexOf(likedRecomId)<0){
-                //     loggingSys.rating.id.push(likedRecomId)
-                //     loggingSys.rating.likes.push(true)
-                //     loggingSys.likedTime++
-                // }else{
-                //     var index = loggingSys.rating.id.indexOf(likedRecomId)
-                //     loggingSys.rating.likes[index] = true
-                //     loggingSys.likedTime++
-                // }
-
+                if(loggingSys.rating.id.indexOf(likedRecomId)<0){
+                    loggingSys.rating.id.push(likedRecomId)
+                    loggingSys.rating.likes.push(true)
+                    if(loggingSys.rating.id.length>1)
+                        loggingSys.rating.same.push(checkGenreVisit(likedRecomId, loggingSys.rating.id[loggingSys.rating.id.length-2]))
+                    else
+                        loggingSys.rating.same.push(false)
+                }else{
+                    var index = loggingSys.rating.id.indexOf(likedRecomId)
+                    loggingSys.rating.likes[index] = true
+                    if(index>0)
+                        loggingSys.rating.same[index] = checkGenreVisit(likedRecomId, loggingSys.rating.id[index-1])
+                    else
+                        loggingSys.rating.same[index] = false
+                }
 
                 if($(this).hasClass("fa-thumbs-o-up")){
                     $(this).removeClass("fa-thumbs-o-up");
@@ -174,6 +221,7 @@ $.ajax({
             .attr("class", "d3-tip")
             .offset([-10, 0])
             .html(function(d) {
+                loggingSys.hoverTime +=1
                 return d["name"] + "<br><br>" + xCat + ": " + d[xCat] + "<br>" + yCat + ": " + d[yCat] +  "<br>"+ rCat + ": " + d[rCat] + "<br>" + colorCat + ": " + d[colorCat];
             });
 
@@ -263,6 +311,20 @@ $.ajax({
                 highlightenResults(d.track, true)
                 selectedNode = d3.select(this)
                 selectedNode.style("stroke","red").style("stroke-width",3)
+
+                //Logging
+                if(loggingSys.vis.length==0){
+                    var circle = {}
+                    circle.id = d.track
+                    circle.same = false
+                    loggingSys.vis.push(circle)
+                }else if(loggingSys.vis.length>0){
+                    var circle = {}
+                    circle.id = d.track
+                    circle.same = checkGenreVisit(d.track, loggingSys.vis[loggingSys.vis.length-1].id)
+                    loggingSys.vis.push(circle)
+                }
+                loggingSys.clickTime +=1
             })
 
         node.append("text")
@@ -337,7 +399,7 @@ $.ajax({
 
         d3.selectAll("select").on("change", change);
         function change() {
-
+            loggingSys.axisTime +=1
             var xSelect=document.getElementById("x-axis"),ySelect=document.getElementById("y-axis");
             var xIndex= xSelect.selectedIndex, yIndex = ySelect.selectedIndex ;
             xCat = xSelect.options[xIndex].value;
@@ -393,15 +455,43 @@ $.ajax({
     }
 })
 
-//d3.csv("/js/vis.csv", function(data) {
-    // data.forEach(function(d) {
-    //     d.popularity = +d.popularity;
-    //     d.danceability = +d.danceability;
-    //     d.energy = +d.energy;
-    //     d.speechiness = +d.speechiness;
-    //     d.acousticness = +d.acousticness;
-    //     d.instrumentalness = +d.instrumentalness;
-    //     d.liveness = +d.liveness;
-    //     d.valence = +d.valence;
-    // });
-//});
+setTimeout(function () {
+    enableEvaluation = true
+    var totalRating = $(".fa-thumbs-up").length + $(".fa-thumbs-down").length
+    if(totalRating==20){
+        $("a.btn.btn-info.questionnaire").attr("href","https://goo.gl/forms/pfo5yBSLxojFZWOB2")
+    }else{
+        $("p#start-feedback").show();
+        setTimeout(function () {
+            $("p#start-feedback").hide();
+        },8000)
+    }
+}, 1000*10*60);
+
+//Sent Logs
+$('.questionnaire').click(function () {
+    var totalRating = $(".fa-thumbs-up").length + $(".fa-thumbs-down").length
+
+    if(totalRating == 20 && enableEvaluation){
+        $("a.btn.btn-info.questionnaire").attr("href","https://goo.gl/forms/pfo5yBSLxojFZWOB2")
+        var currentTime = new Date();
+        var userID = document.getElementById("user-id").innerText
+        loggingSys.duration = currentTime - loggingSys.duration
+        loggingSys.id = userID
+        loggingSys.likedTime = $(".fa-thumbs-up").length
+        console.log(loggingSys)
+        $.ajax({
+            url: '/addRecord',
+            type: 'POST',
+            contentType:'application/json',
+            data: JSON.stringify(loggingSys),
+            dataType:'json'
+        });
+        prompt("Please copy the following ID as the answer to the first question in the questionnaire", userID);
+    }else{
+        $("p#start-feedback").show();
+        setTimeout(function () {
+            $("p#start-feedback").hide();
+        },8000)
+    }
+})
