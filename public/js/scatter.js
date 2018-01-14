@@ -21,7 +21,7 @@ loggingSys.axisTime = 0;
 
 var margin = { top: 50, right: 300, bottom: 50, left: 50 },
     outerWidth = 1050,
-    outerHeight = 600,
+    outerHeight = 500,
     width = outerWidth - margin.left - margin.right,
     height = outerHeight - margin.top - margin.bottom;
 
@@ -368,7 +368,7 @@ $.ajax({
 
         title2.append("text")
             .attr("x", width + 15)
-            .attr("dy", 375)
+            .attr("dy", 325)
             .style("font-size","14px")
             .style("font-weight","bold")
             .text("Popularity");
@@ -382,13 +382,13 @@ $.ajax({
         legend2.append("circle")
             .attr("r", function(d) { return 6 * Math.sqrt(d / Math.PI); })
             .attr("cx", width + 50)
-            .attr("cy", 430)
+            .attr("cy", 380)
             .attr("stroke", "#565352")
             .attr("fill", "none");
 
         legend2.append("text")
             .attr("x", width + 45)
-            .attr("dy", 395)
+            .attr("dy", 345)
             .attr("transform", function(d, i) { return "translate(0," + i * 5 + ")"; })
             .style("font-size","10px")
             .text(function(d) { return d; });
