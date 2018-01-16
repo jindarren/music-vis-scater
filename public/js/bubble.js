@@ -421,7 +421,7 @@ setTimeout(function () {
     enableEvaluation = true
     var totalRating = $(".fa-thumbs-up").length + $(".fa-thumbs-down").length
     if(totalRating==20){
-        $("a.btn.btn-info.questionnaire").attr("href","https://goo.gl/forms/tNqrRPi4zw0hA5kO2")
+        $("a.btn.btn-info.questionnaire").attr("href","https://goo.gl/forms/KXgFKSubmpPmKD993")
     }
 }, 1000*10*60);
 
@@ -430,7 +430,7 @@ $('.questionnaire').click(function () {
     var totalRating = $(".fa-thumbs-up").length + $(".fa-thumbs-down").length
 
     if(totalRating == 20 && enableEvaluation){
-        $("a.btn.btn-info.questionnaire").attr("href","https://goo.gl/forms/tNqrRPi4zw0hA5kO2")
+        $("a.btn.btn-info.questionnaire").attr("href","https://goo.gl/forms/KXgFKSubmpPmKD993")
         var currentTime = new Date();
         var userID = document.getElementById("user-id").innerText
         loggingSys.duration = currentTime - loggingSys.duration
