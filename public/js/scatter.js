@@ -36,6 +36,8 @@ $(document).ready(function () {
                 console.log(data)
                 spotifyToken = data.access_token
                 refreshToken = data.refresh_token
+                $.cookie('spotify-token', spotifyToken);
+                $.cookie('refresh-token', refreshToken);
             }
         })
     }, 3500*1000)
